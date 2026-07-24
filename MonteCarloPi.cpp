@@ -20,7 +20,6 @@ int main(){
     
     }while(N <= 0);
 
-    // Record the start time right before the parallel region begins
     start_time = omp_get_wtime();
 
     /*  generates random N(user input) points, 
@@ -37,7 +36,7 @@ int main(){
 
         #pragma omp for reduction(+:Total_Points_Inside_Circle)    
         for(int count = 0; count < N; count++){
-            //generates a point
+            //generates a random point
             double x = distX(engine);
             double y = distY(engine);
 
@@ -48,7 +47,6 @@ int main(){
         }
     }
 
-    // Record the end time right after the parallel region finishes
     end_time = omp_get_wtime();
 
     //time spent on parallel region
