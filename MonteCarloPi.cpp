@@ -7,8 +7,9 @@ int main(){
     int N;
     double Total_Points_Inside_Circle = 0;
     double MonteCarloPi;
+    double start_time, end_time, elapsed_time;
 
-    //accepts user input
+    //reads user input if the value is positive
     do{
         std::cout << "Enter the amount of points: ";
         std::cin >> N;
@@ -18,6 +19,9 @@ int main(){
         }
     
     }while(N <= 0);
+
+    // Record the start time right before the parallel region begins
+    start_time = omp_get_wtime();
 
     /*  generates random N(user input) points, 
         and keeps track of total number of points and number of points inside the circle */
@@ -44,9 +48,17 @@ int main(){
         }
     }
 
-    //prints the estimated pi
+    // Record the end time right after the parallel region finishes
+    end_time = omp_get_wtime();
+
+    //time spent on parallel region
+    elapsed_time = end_time - start_time;
+
+    //The estimated pi
     MonteCarloPi = 4 * (Total_Points_Inside_Circle/N);
+
     std::cout << "ESTIMATED PI = " << MonteCarloPi << '\n'; 
+    std::cout << "Passed Time = " << elapsed_time << " seconds" << '\n';
     
     return 0;
 }
