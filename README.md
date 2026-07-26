@@ -24,14 +24,20 @@ inside the inscribed unit circle approximates Pi/4.
   random seed.
 - `#pragma omp for reduction(+:...)` splits the loop across threads and safely
   combines hit counts.
+  
+### Timing Methodology
 
-**Timing methodology.** Both versions measure only the computation loop plus
-the reduction. Random engine construction and worker startup are excluded:
+Both versions measure the same two things: the point-generation loop and the
+combination of partial results. Worker creation, user input and RNG engine
+construction are excluded from both.
 
-- MPI starts `MPI_Wtime()` after `MPI_Barrier`, once every rank is set up.
-- OpenMP starts `omp_get_wtime()` *inside* the parallel region, after an
-  `omp barrier` and within an `omp single` block, so thread-pool creation and
-  per-thread engine construction fall outside the measured window.
+- **MPI** starts the clock after `MPI_Barrier` (all ranks ready, engines built)
+  and stops it after `MPI_Reduce` returns.
+- **OpenMP** starts the clock *inside* the parallel region, after an explicit
+  `omp barrier` guarantees every thread has built its engine, and stops it once
+  the implicit barrier at the end of `omp for` has combined all partial counts.
+
+In both cases the measurement is bounded by the slowest worker.
 
 ## Requirements
 
