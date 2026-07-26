@@ -51,9 +51,9 @@ Both prompt for the number of points to simulate.
 
 | Points | Processes/Threads | Samples | MPI Avg Time (s) | OpenMP Avg Time (s) |
 |---|---|---|---|---|
-| 1,000,000 | 8 | 50 | - | - |
-| 10,000,000 | 8 | 50 | - | - |
-| 100,000,000 | 8 | 50 | - | - |
+| 1,000,000 | 8 | 100 | - | - |
+| 10,000,000 | 8 | 100 | - | - |
+| 100,000,000 | 8 | 100 | - | - |
 
 ## Author
 
