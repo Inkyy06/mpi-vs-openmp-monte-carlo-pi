@@ -20,8 +20,6 @@ int main(){
     
     }while(Total_Points <= 0);
 
-    start_time = omp_get_wtime();
-
     /*  generates random N(user input) points, 
         and keeps track of total number of points and number of points inside the circle */
     #pragma omp parallel
@@ -33,6 +31,8 @@ int main(){
         std::uniform_real_distribution<double> distX(-1.0, 1.0);
         //Y coordinate distribution
         std::uniform_real_distribution<double> distY(-1.0, 1.0);
+
+        start_time = omp_get_wtime();
 
         #pragma omp for reduction(+:Points_Inside_Circle)    
         for(int count = 0; count < Total_Points; count++){
