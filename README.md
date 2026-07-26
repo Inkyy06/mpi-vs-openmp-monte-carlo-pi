@@ -45,8 +45,6 @@ OMP_NUM_THREADS=8 ./OMP_MonteCarloPi   # OpenMP
 
 Both prompt for the number of points to simulate.
 
-> Note: the OpenMP target is built with `g++-16` and `-fopenmp`, while the MPI target is built with `mpicxx`. See the `Makefile` for exact build rules.
-
 ## Results
 
 Measured with 8 MPI processes / 8 OpenMP threads, 100 samples per configuration.
