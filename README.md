@@ -1,49 +1,72 @@
 # MPI vs OpenMP Monte Carlo Pi Estimation
 
-Estimates Pi using the Monte Carlo method, implemented in both MPI and OpenMP to compare their performance.
+Estimates Pi using the Monte Carlo method, implemented in both MPI and OpenMP
+to compare their performance.
 
 ## How It Works
 
-Random points are generated inside a 2x2 square; the ratio of points falling inside the inscribed unit circle approximates Pi/4.
+Random points are generated inside a 2x2 square; the ratio of points falling
+inside the inscribed unit circle approximates Pi/4.
 
 ## Implementation Details
 
 **MPI version** (`MPI_MonteCarloPi.cpp`):
 - Rank 0 reads the number of points and broadcasts it via `MPI_Bcast`.
-- Each rank generates its own share of points (`Total_Points / size`) with a rank-specific random seed; any remainder is added to the last rank so the total matches exactly.
+- Each rank generates its own share of points (`Total_Points / size`) with a
+  rank-specific random seed; any remainder is added to the last rank so the
+  total matches exactly.
 - Local hit counts are summed across all ranks using `MPI_Reduce` (`MPI_SUM`).
 - Rank 0 computes and prints the final estimate and elapsed time.
 
 **OpenMP version** (`OMP_MonteCarloPi.cpp`):
 - The main thread reads the number of points.
-- `#pragma omp parallel` spawns threads, each with its own thread-specific random seed.
-- `#pragma omp for reduction(+:...)` splits the loop across threads and safely combines hit counts.
-- Elapsed time is measured with `omp_get_wtime()`.
+- `#pragma omp parallel` spawns threads, each with its own thread-specific
+  random seed.
+- `#pragma omp for reduction(+:...)` splits the loop across threads and safely
+  combines hit counts.
+
+**Timing methodology.** Both versions measure only the computation loop plus
+the reduction. Random engine construction and worker startup are excluded:
+
+- MPI starts `MPI_Wtime()` after `MPI_Barrier`, once every rank is set up.
+- OpenMP starts `omp_get_wtime()` *inside* the parallel region, after an
+  `omp barrier` and within an `omp single` block, so thread-pool creation and
+  per-thread engine construction fall outside the measured window.
 
 ## Requirements
 
-- MPI implementation (e.g. [Open MPI](https://www.open-mpi.org/))
-- A GCC compiler with OpenMP support — on macOS, the default `clang` does not support `-fopenmp` out of the box, so this project uses Homebrew's GCC.
-
-macOS setup:
-```zsh
-brew install open-mpi gcc
-```
-```zsh
-brew install libomp
-```
-
+- An MPI implementation, e.g. [Open MPI](https://www.open-mpi.org/)
+- GCC with OpenMP support — macOS's default `clang` does not support
+  `-fopenmp` out of the box, so this project uses Homebrew's GCC.
+  
 ## Build & Run
 
 ```zsh
-make MPI_MonteCarloPi 
-mpirun -np 8 ./MPI_MonteCarloPi        # MPI
+make all                               # builds both targets
 
-make OMP_MonteCarloPi
+mpirun -np 8 ./MPI_MonteCarloPi        # MPI
 OMP_NUM_THREADS=8 ./OMP_MonteCarloPi   # OpenMP
+
+make clean                             # removes binaries and *.dSYM
 ```
 
-Both prompt for the number of points to simulate.
+Both prompt for the number of points to simulate. `Total_Points` is an `int`,
+so the maximum supported input is 2,147,483,647.
+
+> Changing the compiler flags requires `make clean` first — Make compares file
+> timestamps and will not rebuild if only the Makefile changed.
+
+## Test Environment
+
+| | |
+|---|---|
+| Machine | MacBook Air 13" (M5, 2026), fanless |
+| CPU | Apple M5 — 10 cores (4 performance + 6 efficiency) |
+| Memory | 16 GB unified |
+| OS | macOS *(macOS Tahoe 26.5.1)* |
+| Compiler | GCC *(g++-16 (Homebrew GCC 16.1.0) 16.1.0)* |
+| MPI | Open MPI *(mpirun (Open MPI) 5.0.9)* |
+| Flags | `-O2 -std=c++17` |
 
 ## Results
 
