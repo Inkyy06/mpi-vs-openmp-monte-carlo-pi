@@ -34,7 +34,7 @@ int main(){
         //Y coordinate distribution
         std::uniform_real_distribution<double> distY(-1.0, 1.0);
 
-        #pragma omp for reduction(+:Total_Points_Inside_Circle)    
+        #pragma omp for reduction(+:Points_Inside_Circle)    
         for(int count = 0; count < Total_Points; count++){
             //generates a random point
             double x = distX(engine);
