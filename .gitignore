@@ -4,3 +4,6 @@ OMP_MonteCarloPi.dSYM/
 .vscode/
 MPI_MonteCarloPi.dSYM
 MPI_MonteCarloPi
+benchmark.sh
+results_raw.csv
+results_table.md
